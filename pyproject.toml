@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "offline-environment-auditor"
+version = "0.1.0"
+description = "Evidence-based local Kubernetes configuration audit and isolated Trivy adapter"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+offline-audit = "offline_auditor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
