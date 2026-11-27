@@ -150,6 +150,22 @@ class ScannerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             import_report({"SchemaVersion": 2}, "sha")
 
+    def test_invalid_vulnerability_lists_cannot_produce_clean_reports(self):
+        for value in ({}, False, "", 0, "invalid", {"entry": 1}):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                import_report({"SchemaVersion": 2, "Results": [{"Vulnerabilities": value}]}, "sha")
+
+    def test_invalid_result_sections_are_rejected(self):
+        for value in (None, [], False, ""):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                import_report({"SchemaVersion": 2, "Results": [value]}, "sha")
+
+    def test_empty_vulnerability_sections_remain_supported(self):
+        for section in ({}, {"Vulnerabilities": None}, {"Vulnerabilities": []}):
+            with self.subTest(section=section):
+                report = import_report({"SchemaVersion": 2, "Results": [section]}, "sha")
+                self.assertEqual(report["findings"], [])
+
     def test_container_has_no_network_pull_or_docker_socket(self):
         command = build_command(["docker", "--host", "unix:///var/run/docker.sock"], DIGEST,
                                 Path("/tmp/image.tar"), Path("/tmp/cache"))

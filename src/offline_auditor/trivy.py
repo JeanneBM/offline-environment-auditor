@@ -19,7 +19,11 @@ def import_report(document, source_hash, label="local-image"):
         raise ValueError("Expected a Trivy schema-2 JSON report with Results")
     findings = {}
     for result_index, result in enumerate(document["Results"]):
-        vulnerabilities = result.get("Vulnerabilities") or []
+        if not isinstance(result, dict):
+            raise ValueError("Invalid result section")
+        vulnerabilities = result.get("Vulnerabilities")
+        if vulnerabilities is None:
+            vulnerabilities = []
         if not isinstance(vulnerabilities, list):
             raise ValueError("Invalid vulnerability list")
         for index, value in enumerate(vulnerabilities):
